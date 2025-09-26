@@ -16,7 +16,9 @@
         public Boolean IsAvailable { get; set; }
 
         //Navigator
-        public Events? Events { get; set; }
+        public Games? Games { get; set; }
+        public Concerts? Concerts { get; set; }
+      
 
 
 
