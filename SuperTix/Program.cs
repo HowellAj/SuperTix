@@ -1,4 +1,9 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using SuperTix.Data;
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<SuperTixContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SuperTixContext") ?? throw new InvalidOperationException("Connection string 'SuperTixContext' not found.")));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

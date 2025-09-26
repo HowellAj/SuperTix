@@ -1,14 +1,16 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace SuperTix.Models
 {
-    public class Games
+    public class Game
     {
         //PK 
         public int GameID { get; set; }
 
         //FK
-        public int TicketID { get; set; }
+        public int CategoryID { get; set; }
 
-        public string GameName { get; set; }
+        public string GameName { get; set; } = string.Empty;
 
         public string GameDescription { get; set; } = string.Empty;
 
@@ -16,9 +18,13 @@ namespace SuperTix.Models
 
         public DateTime GameDate { get; set; }
 
+        public DateTime CreateDate { get; set; }
+
+        public string Owner { get; set; } = string.Empty;
+
         public string GameLocation { get; set; } = string.Empty;
 
         //Navigator
-        public List<Ticket>? Tickets { get; set; }
+        public Category ? Category { get; set; }
     }
 }
