@@ -1,4 +1,51 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
-<h1> Super Tix Site</h1>
+<h1> Super Tix</h1>
+
+<div class="container text-center">
+    <div class="row">
+
+        @*Sports coloumn*@
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Sports</h4>
+                </div>
+                <img src="~/images/thumbnails/sports.jpg" class="card-img-top" class ="img-fluid"alt="Sporting Event Thumbnail">
+                <div class="card-body">
+                    <p class="card-text">Checkout all the current sport events we have tickets to!</p>
+                    <a class="btn btn-primary" class="nav-link text-dark" asp-area="" asp-controller="Games" asp-action="Index">All Games</a>
+                </div>
+            </div>
+        </div>
+
+        @* Categories coloumn*@
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Categories</h4>
+                </div>
+                <img src="~/images/thumbnails/category.png" class="card-img-top" class="img-fluid" alt="CategoryThumbnail">
+                <div class="card-body">
+                    <p class="card-text">Index of all different categories</p>
+                    <a class="btn btn-primary" class="nav-link text-dark" asp-area="" asp-controller="Categories" asp-action="Index">All Categories</a>
+                </div>
+            </div>
+        </div>
+
+        @* Add event shortcut coloumn*@
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Add Game</h4>
+                </div>
+                <img src="~/images/thumbnails/calendar.svg" class="card-img-top" class="img-fluid" alt="Sporting Event Thumbnail">
+                <div class="card-body">
+                    <p class="card-text">Shortcut to add game page</p>
+                    <a class="btn btn-primary" class="nav-link text-dark" asp-area="" asp-controller="Games" asp-action="Create">Add Game</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
