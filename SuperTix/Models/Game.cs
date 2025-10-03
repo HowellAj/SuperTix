@@ -1,26 +1,30 @@
-﻿namespace SuperTix.Models
+using System.ComponentModel.DataAnnotations;
+
+namespace SuperTix.Models
 {
     public class Game
     {
-        //PK
-        public int GameId { get; set; }
+        //PK 
+        public int GameID { get; set; }
 
-        //FK to Category
-        public int CategoryId { get; set; }
+        //FK
+        public int CategoryID { get; set; }
 
-        public string? GameName { get; set; }
+        public string GameName { get; set; } = string.Empty;
 
-        public string? Description { get; set; }
+        public string GameDescription { get; set; } = string.Empty;
+
+        public string GameType { get; set; } = string.Empty;
 
         public DateTime GameDate { get; set; }
 
         public DateTime CreateDate { get; set; }
 
-        public string? Owner { get; set; }
+        public string Owner { get; set; } = string.Empty;
 
-        public string? Location { get; set; }
+        public string GameLocation { get; set; } = string.Empty;
 
-        public Category? Category { get; set; }
-
+        //Navigator
+        public Category ? Category { get; set; }
     }
 }

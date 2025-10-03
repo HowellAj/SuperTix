@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SuperTix.Data;
 
@@ -11,9 +12,11 @@ using SuperTix.Data;
 namespace SuperTix.Migrations
 {
     [DbContext(typeof(SuperTixContext))]
-    partial class SuperTixContextModelSnapshot : ModelSnapshot
+    [Migration("20250926172536_InitialMigration")]
+    partial class InitialMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,23 +24,6 @@ namespace SuperTix.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("SuperTix.Models.Category", b =>
-                {
-                    b.Property<int>("CategoryID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CategoryID"));
-
-                    b.Property<string>("CategoryName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("CategoryID");
-
-                    b.ToTable("Category");
-                });
 
             modelBuilder.Entity("SuperTix.Models.Game", b =>
                 {
@@ -60,6 +46,9 @@ namespace SuperTix.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("GameID1")
+                        .HasColumnType("int");
+
                     b.Property<string>("GameLocation")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -78,23 +67,19 @@ namespace SuperTix.Migrations
 
                     b.HasKey("GameID");
 
-                    b.HasIndex("CategoryID");
+                    b.HasIndex("GameID1");
 
                     b.ToTable("Game");
                 });
 
             modelBuilder.Entity("SuperTix.Models.Game", b =>
                 {
-                    b.HasOne("SuperTix.Models.Category", "Category")
+                    b.HasOne("SuperTix.Models.Game", null)
                         .WithMany("Games")
-                        .HasForeignKey("CategoryID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
+                        .HasForeignKey("GameID1");
                 });
 
-            modelBuilder.Entity("SuperTix.Models.Category", b =>
+            modelBuilder.Entity("SuperTix.Models.Game", b =>
                 {
                     b.Navigation("Games");
                 });

@@ -22,8 +22,7 @@ namespace SuperTix.Controllers
         // GET: Games
         public async Task<IActionResult> Index()
         {
-            var superTixContext = _context.Game.Include(g => g.Category);
-            return View(await superTixContext.ToListAsync());
+            return View(await _context.Game.ToListAsync());
         }
 
         // GET: Games/Details/5
@@ -35,8 +34,7 @@ namespace SuperTix.Controllers
             }
 
             var game = await _context.Game
-                .Include(g => g.Category)
-                .FirstOrDefaultAsync(m => m.GameId == id);
+                .FirstOrDefaultAsync(m => m.GameID == id);
             if (game == null)
             {
                 return NotFound();
@@ -48,7 +46,6 @@ namespace SuperTix.Controllers
         // GET: Games/Create
         public IActionResult Create()
         {
-            ViewData["CategoryId"] = new SelectList(_context.Category, "CategoryId", "CategoryId");
             return View();
         }
 
@@ -57,7 +54,7 @@ namespace SuperTix.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("GameId,CategoryId,GameName,Description,GameDate,CreateDate,Owner,Location")] Game game)
+        public async Task<IActionResult> Create([Bind("GameID,TicketID,GameName,GameDescription,GameType,GameDate,CreateDate,Owner,GameLocation")] Game game)
         {
             if (ModelState.IsValid)
             {
@@ -65,7 +62,6 @@ namespace SuperTix.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.Category, "CategoryId", "CategoryId", game.CategoryId);
             return View(game);
         }
 
@@ -82,7 +78,6 @@ namespace SuperTix.Controllers
             {
                 return NotFound();
             }
-            ViewData["CategoryId"] = new SelectList(_context.Category, "CategoryId", "CategoryId", game.CategoryId);
             return View(game);
         }
 
@@ -91,9 +86,9 @@ namespace SuperTix.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("GameId,CategoryId,GameName,Description,GameDate,CreateDate,Owner,Location")] Game game)
+        public async Task<IActionResult> Edit(int id, [Bind("GameID,TicketID,GameName,GameDescription,GameType,GameDate,CreateDate,Owner,GameLocation")] Game game)
         {
-            if (id != game.GameId)
+            if (id != game.GameID)
             {
                 return NotFound();
             }
@@ -107,7 +102,7 @@ namespace SuperTix.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!GameExists(game.GameId))
+                    if (!GameExists(game.GameID))
                     {
                         return NotFound();
                     }
@@ -118,7 +113,6 @@ namespace SuperTix.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.Category, "CategoryId", "CategoryId", game.CategoryId);
             return View(game);
         }
 
@@ -131,8 +125,7 @@ namespace SuperTix.Controllers
             }
 
             var game = await _context.Game
-                .Include(g => g.Category)
-                .FirstOrDefaultAsync(m => m.GameId == id);
+                .FirstOrDefaultAsync(m => m.GameID == id);
             if (game == null)
             {
                 return NotFound();
@@ -158,7 +151,7 @@ namespace SuperTix.Controllers
 
         private bool GameExists(int id)
         {
-            return _context.Game.Any(e => e.GameId == id);
+            return _context.Game.Any(e => e.GameID == id);
         }
     }
 }
