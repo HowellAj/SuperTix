@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using SuperTix.Data;
@@ -7,6 +8,24 @@ builder.Services.AddDbContext<SuperTixContext>(options =>
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+
+// Add user cookie authentication
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+        options.SlidingExpiration = true; // Reset the expiration time if the user is active
+        options.LoginPath = "/Account/Login"; // re-direct to login page
+        options.LogoutPath = "/Account/Logout"; // re-direct to logout page
+        options.AccessDeniedPath = "/Account/AccessDenied"; // re-direct to access denied page
+    });
+
+
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddUserSecrets<Program>();
+}
 
 var app = builder.Build();
 

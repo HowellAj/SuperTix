@@ -1,4 +1,7 @@
-﻿namespace SuperTix.Models
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace SuperTix.Models
 {
     public class Game
     {
@@ -21,6 +24,12 @@
         public string? Location { get; set; }
 
         public Category? Category { get; set; }
+
+        public string? PhotoPath { get; set; }
+
+        [NotMapped]
+        [Display(Name = "Photo")]
+        public IFormFile? FormFile { get; set; }
 
     }
 }

@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>1f7a99fe-5d25-437d-880f-2061fff9f324</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,6 +18,8 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\NewFolder1\" />
+	  <Folder Include="wwwroot\images\" />
+	  <Folder Include="wwwroot\photos\" />
   </ItemGroup>
 
 </Project>

@@ -38,6 +38,9 @@
     <tbody>
 @foreach (var item in Model) {
         <tr>
+            <td class="thumbnail">
+                   <img src="@item.PhotoPath" alt="@item.GameName" class="img-fluid" />
+            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.GameName)
             </td>

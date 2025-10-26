@@ -27,6 +27,11 @@ body {
     margin-bottom: 60px;
 }
 
+.thumbnail {
+    width: 128px;
+    height: 128px;
+}
+
 
 .btn-primary {
     background-color: #FFD500;
