@@ -13,6 +13,7 @@
         <form asp-action="Edit" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="GameId" />
+            <input type="hidden" asp-for="PhotoPath"/>
             
             <div class="form-group">
                 <label asp-for="CategoryId" class="control-label"></label>
@@ -55,7 +56,6 @@
                 <p>Photo path is @Model.PhotoPath</p>
             </div>
 
-            <input type="hidden" asp-for="PhotoPath" />
 
             <!-- File input! -->
             <div class="mb-3">

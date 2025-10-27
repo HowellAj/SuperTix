@@ -1,26 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SuperTix.Data;
+using SuperTix.Migrations;
 using SuperTix.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SuperTix.Controllers
 {
+    [Authorize]
     public class GamesController : Controller
     {
         private readonly SuperTixContext _context;
         private readonly ILogger<GamesController> _logger;
+        private readonly BlobContainerClient _containerClient;
+        private readonly IConfiguration _configuration;
 
 
-        public GamesController(SuperTixContext context, ILogger<GamesController> logger)
+        public GamesController(SuperTixContext context, ILogger<GamesController> logger, IConfiguration configuration)
         {
             _context = context;
             _logger = logger;
+            _configuration = configuration;
 
+            var connectionString = _configuration["AzureStorage"];
+            var containerName = "supertix-album-uploads";
+            _containerClient = new BlobContainerClient(connectionString, containerName);
+           
         }
 
         // GET: Games
@@ -52,7 +65,7 @@ namespace SuperTix.Controllers
         // GET: Games/Create
         public IActionResult Create()
         {
-            ViewData["CategoryId"] = new SelectList(_context.Category, "CategoryId", "CategoryId");
+            ViewData["CategoryId"] = new SelectList(_context.Category, "CategoryId", "CategoryName");
             return View();
         }
 
@@ -65,23 +78,31 @@ namespace SuperTix.Controllers
         {
             if (ModelState.IsValid)
             {
-
                 if (game.FormFile != null)
                 {
-                    // Generate unique filename
-                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(game.FormFile.FileName);
+         
+                    var fileUpload = game.FormFile;
 
-                    game.PhotoPath = "/photos/" + fileName;
+                    // Create a unique name for the blob
+                    string blobName = Guid.NewGuid().ToString() + "_" + fileUpload.FileName;
 
-                    // Save to wwwroot
-                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/photos", fileName);
-                    
-                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    var blobClient = _containerClient.GetBlobClient(blobName);
+
+                    using (var stream = fileUpload.OpenReadStream())
                     {
-                        await game.FormFile.CopyToAsync(stream);
+                        await blobClient.UploadAsync(stream, new BlobHttpHeaders { ContentType = fileUpload.ContentType });
                     }
-              
+
+                    //url to access the file
+                    game.PhotoPath = blobClient.Uri.ToString();
+
                 }
+                else
+                {
+                    game.PhotoPath = "https://nscc0439218storageblob.blob.core.windows.net/supertix-album-uploads/placeholder.png";
+                }
+
+
 
                 _context.Add(game);
                 await _context.SaveChangesAsync();
@@ -113,7 +134,7 @@ namespace SuperTix.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("GameId,CategoryId,GameName,Description,GameDate,CreateDate,Owner,Location,FormFile")] Game game)
+        public async Task<IActionResult> Edit(int id, [Bind("GameId,CategoryId,GameName,Description,GameDate,CreateDate,Owner,Location,PhotoPath,FormFile")] Game game)
         {
             if (id != game.GameId)
             {
@@ -124,44 +145,40 @@ namespace SuperTix.Controllers
             {
                 try
                 {
-                    // Step 1: save the new file (optionally)
-                    if (game.FormFile != null)
+                    var existing = await _context.Game.AsNoTracking().FirstOrDefaultAsync(game => game.GameId == id);
+                    if (existing == null) return NotFound();
+
+                    if (game.FormFile != null && game.FormFile.Length > 0)
                     {
-                        // 1. Generate a unique filename
-                        var newFileName = Guid.NewGuid().ToString() + Path.GetExtension(game.FormFile.FileName);
+                        // Generate unique name
+                        var blobName = Guid.NewGuid().ToString() + "_" + game.FormFile.FileName;
 
-                        // 2. Save the new file to wwwroot/photos
-                        var newPhotoPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/photos", newFileName);
-
-                        using (var stream = new FileStream(newPhotoPath, FileMode.Create))
+                        //  Upload new file
+                        var blobClient = _containerClient.GetBlobClient(blobName);
+                        using (var stream = game.FormFile.OpenReadStream())
                         {
-                            await game.FormFile.CopyToAsync(stream);
-                        }
-                  
-
-
-                        // 3. Delete the old file
-                        if (!string.IsNullOrEmpty(game.PhotoPath))
-                        {
-                            var oldFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", game.PhotoPath.TrimStart('/'));
-
-
-                            if (System.IO.File.Exists(oldFilePath))
-                            {
-                                _logger.LogInformation("Attempting delete: {Path}", oldFilePath);
-                                System.IO.File.Delete(oldFilePath);
-                            }
+                            await blobClient.UploadAsync(stream, new BlobHttpHeaders { ContentType = game.FormFile.ContentType });
                         }
 
-                        // Update photo path
-                        game.PhotoPath = "/photos/" + newFileName;
 
+                        // Delete old file if it exists and isn’t placeholder
+                        if (!string.IsNullOrEmpty(existing.PhotoPath) && !existing.PhotoPath.EndsWith("placeholder.png"))
+                        {
+                            var oldBlobName = Path.GetFileName(new Uri(existing.PhotoPath).LocalPath);
+                            var oldBlobClient = _containerClient.GetBlobClient(oldBlobName);
+                            await oldBlobClient.DeleteIfExistsAsync();
+                        }
+
+                        // Update path to new blob
+                        game.PhotoPath = blobClient.Uri.ToString();
                     }
+               
 
                     // Step 2: save the record
                     _context.Update(game);
                     await _context.SaveChangesAsync();
                 }
+
 
                 catch (DbUpdateConcurrencyException)
                 {
