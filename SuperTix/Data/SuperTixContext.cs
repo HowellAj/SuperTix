@@ -16,5 +16,6 @@ namespace SuperTix.Data
 
         public DbSet<SuperTix.Models.Category> Category { get; set; } = default!;
         public DbSet<SuperTix.Models.Game> Game { get; set; } = default!;
+        public DbSet<SuperTix.Models.Purchase> Purchase { get; set; } = default!;
     }
 }
